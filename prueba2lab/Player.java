@@ -21,6 +21,7 @@ public class Player extends javax.swing.JFrame {
     private BasicPlayer played;
     private String currentFilePath;
     int cantidadCanciones=0;
+    private boolean Pause=false;
 
     /**
      * Creates new form Player
@@ -258,13 +259,18 @@ public class Player extends javax.swing.JFrame {
 
     private void playMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playMouseClicked
         try{
-            if(!listaCanciones.isEmpty()){
+        if(!listaCanciones.isEmpty()){
+            if(!Pause){
                 String currentSongPath=listaCanciones.get(currentIndex);
                 Play(currentSongPath);
+            }else{
+                played.resume();
+                Pause=false;
             }
-        } catch (BasicPlayerException ex) {
-            java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+    } catch (BasicPlayerException ex) {
+        java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
     }//GEN-LAST:event_playMouseClicked
 
     private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
@@ -295,6 +301,7 @@ public class Player extends javax.swing.JFrame {
 
     private void stopMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopMouseClicked
         Stop();
+        Pause=false;
     }//GEN-LAST:event_stopMouseClicked
 
     
@@ -335,23 +342,29 @@ public class Player extends javax.swing.JFrame {
     }
     
     private void Play(String songPath) throws BasicPlayerException {
-    if (!songPath.isEmpty()) {
-        try {
-            played.open(new File(songPath));
-            played.play(); // Inicia la reproducción
-        } catch (BasicPlayerException e) {
+    if(!songPath.isEmpty()){
+        try{
+            if(played.getStatus()==BasicPlayer.PAUSED){
+                played.resume();
+            }else{
+                played.open(new File(songPath));
+                played.play(); 
+            }
+        }catch(BasicPlayerException e){
             e.printStackTrace();
         }
+        Pause=false;
     }
 }
 
 
    private void Stop() {
     try {
-        played.stop();
+        played.pause();  
     } catch (BasicPlayerException e) {
         e.printStackTrace();
     }
+    Pause = true;
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -368,5 +381,4 @@ public class Player extends javax.swing.JFrame {
     private javax.swing.JButton stop;
     private javax.swing.JSlider volumen;
     // End of variables declaration//GEN-END:variables
-
 }
